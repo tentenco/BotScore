@@ -118,3 +118,27 @@ See [.env.example](.env.example) and [.env.production.example](.env.production.e
 Questions, product feedback, rule proposals, and deployment notes belong in [GitHub Discussions](https://github.com/tentenco/BotScore/discussions). Please avoid posting credentials, private reports, customer data, or non-public URLs.
 
 BotScore is a Tenten product. Related company sites and official social channels are available from the product footer.
+
+## OpenAI Build Week 2026 — built with Codex
+
+BotScore was designed and implemented with **Codex (GPT-5.6)** during the Build Week submission period. Codex was used end-to-end: drafting the product strategy and versioned audit rules, implementing the deterministic scanner and pg-boss worker pipeline, building the animated results experience, and producing the Docker Compose production stack.
+
+Codex session IDs (local session logs, 2026-07-14, model `gpt-5.6-sol`):
+
+- `019f5eaf-ca2f-7340-920b-0f3fee0755ed` (11:33 — product strategy, scaffold, audit rules engine)
+- `019f5f32-4e3a-71d3-a79a-6ea030c62cd6` (13:56 — scanner/worker pipeline, API routes, report gating)
+- `019f5f5b-72ad-7251-b748-3629aadeb50b` (14:40 — results design system, Docker/Caddy production stack, tests)
+
+Hackathon materials (demo script, Devpost submission copy) live in [`hackathon/`](hackathon/).
+
+### Judge quickstart
+
+```bash
+pnpm install
+cp .env.example .env.local   # defaults work; PostgreSQL required
+pnpm db:migrate
+pnpm dev                     # terminal 1 — web/API
+pnpm worker                  # terminal 2 — audit worker
+```
+
+Or run the full production stack with `docker compose up -d --build` (set `APP_DOMAIN=localhost`). Then open the app, submit any public URL, and watch the audit stream in. Quality gates: `pnpm typecheck && pnpm lint && pnpm test:run && pnpm build`.
