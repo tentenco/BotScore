@@ -113,6 +113,10 @@ See [.env.example](.env.example) and [.env.production.example](.env.production.e
 - [Results experience design](docs/RESULTS_DESIGN.md)
 - [Ubuntu VPS operations and scaling](docs/SCALING_AND_DEVOPS.md)
 
+## License
+
+BotScore is available under the [MIT License](LICENSE).
+
 ## Community
 
 Questions, product feedback, rule proposals, and deployment notes belong in [GitHub Discussions](https://github.com/tentenco/BotScore/discussions). Please avoid posting credentials, private reports, customer data, or non-public URLs.
