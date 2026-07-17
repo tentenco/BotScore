@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BotScore — OpenAI Build Week 交件包</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --text:#e6edf3; --muted:#8b949e;
+    --accent:#4ac6b7; --accent2:#e3b341; --line:#2d333b; --pass:#3fb950; --warn:#d29922;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f6f8fa; --panel:#ffffff; --panel2:#eef2f6; --text:#1f2328; --muted:#57606a;
+           --accent:#0e8074; --accent2:#9a6700; --line:#d0d7de; }
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text);
+        font-family:"PingFang TC","Noto Sans TC",-apple-system,"Segoe UI",sans-serif;
+        line-height:1.75; padding:2.5rem 1.25rem 5rem;}
+  main{max-width:880px; margin:0 auto;}
+  h1{font-size:1.9rem; letter-spacing:.02em; margin-bottom:.3rem;}
+  .sub{color:var(--muted); margin-bottom:2.2rem;}
+  h2{font-size:1.25rem; margin:2.6rem 0 1rem; padding-bottom:.45rem;
+     border-bottom:2px solid var(--accent); display:flex; align-items:center; gap:.5rem;}
+  h2 .no{color:var(--accent); font-family:ui-monospace,monospace; font-size:1rem;}
+  h3{font-size:1.02rem; margin:1.4rem 0 .5rem; color:var(--accent2);}
+  p{margin-bottom:.8rem;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:12px;
+          padding:1.6rem 1.8rem; margin-bottom:1.4rem;}
+  code{font-family:ui-monospace,"SF Mono",monospace; font-size:.86em; background:var(--panel2);
+       border:1px solid var(--line); border-radius:5px; padding:.1em .4em;}
+  .tablewrap{overflow-x:auto;}
+  table{border-collapse:collapse; width:100%; font-size:.92rem; margin:.6rem 0 1rem;}
+  th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+  th{background:var(--panel2); white-space:nowrap;}
+  ul,ol{padding-left:1.4rem; margin-bottom:.9rem;}
+  li{margin-bottom:.35rem;}
+  .pill{display:inline-block; border-radius:999px; padding:.05rem .65rem; font-size:.8rem;
+        border:1px solid var(--accent); color:var(--accent); margin-right:.4rem;}
+  .kpi{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.8rem; margin:.8rem 0;}
+  .kpi div{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:.8rem 1rem;}
+  .kpi b{display:block; font-size:1.05rem; color:var(--accent);}
+  .kpi span{color:var(--muted); font-size:.85rem;}
+  .todo li.done::marker{content:"✅ ";}
+  .todo li.wait::marker{content:"⬜ ";}
+  .quote{border-left:3px solid var(--accent); padding:.5rem 1rem; background:var(--panel2);
+         border-radius:0 8px 8px 0; color:var(--muted); font-style:italic; margin:.8rem 0;}
+  .warn{border-left:3px solid var(--warn); padding:.6rem 1rem; background:var(--panel2);
+        border-radius:0 8px 8px 0; margin:.8rem 0;}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:3rem;}
+</style>
+</head>
+<body>
+<main>
+  <h1>🛰️ BotScore</h1>
+  <p class="sub">OpenAI Build Week 2026 交件包 · Track: Work &amp; Productivity · 截止:台灣時間 2026-07-22 08:00</p>
+
+  <section>
+    <h2><span class="no">01</span>產品是什麼(分析摘要)</h2>
+    <p><strong>一句話:</strong>以「證據」為本的 SEO / AEO / GEO 檢測器 — 找出阻止搜尋引擎<em>與</em> AI 答案引擎發現、理解、引用你網站的原因,並給出優先修復計畫。</p>
+    <div class="kpi">
+      <div><b>SEO</b><span>HTTP、robots、索引指令、canonical、sitemap、初始 HTML、結構化資料</span></div>
+      <div><b>AEO</b><span>答案摘要、章節結構、定義、來源、作者、日期、agent 可操作語意</span></div>
+      <div><b>GEO</b><span>AI crawler 存取、可引用證據、品牌實體、摘要控制、server 渲染</span></div>
+    </div>
+    <h3>運作流程</h3>
+    <ol>
+      <li>使用者提交網址 → <code>POST /api/audits</code> 正規化網址、原子配額、入列持久任務(pg-boss)</li>
+      <li>獨立 worker 以 headless Chromium 抓取原始+渲染 HTML,執行版本化規則引擎的全部檢查</li>
+      <li>公開結果頁(動畫)免費呈現摘要 findings;輪詢自動退避</li>
+      <li>Email gate → HubSpot 同步 → 7 天雜湊 token 開啟 <code>/report/[token]</code> 完整報告</li>
+      <li>LLM(OpenRouter,預設關閉)只負責敘事,<strong>永不決定 pass/fail</strong>、不接觸名單資料</li>
+    </ol>
+    <h3>技術架構</h3>
+    <p>Next.js(App Router, TS)+ PostgreSQL + pg-boss + Playwright/Chromium worker + Docker Compose + Caddy(HTTPS)。具備健康檢查端點、任務重試退避、備份還原文件、vitest 測試。<strong>是生產級產品,不是 demo。</strong></p>
+    <p><strong>商業定位:</strong>為 geo.tenten.co 產生合格名單 — 用可信診斷換 email,高意圖名單進 HubSpot 流程。評審視角:真實問題、真實商模、完整產品體驗(Potential Impact + Design 得分點)。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">02</span>參賽合規證據(Codex + GPT-5.6)</h2>
+    <p>三個真實 Codex session(模型 <code>gpt-5.6-sol</code>,2026-07-14,提交期間內),已寫入 README:</p>
+    <div class="tablewrap"><table>
+      <tr><th>時間</th><th>Session ID</th><th>工作內容</th></tr>
+      <tr><td>11:33</td><td><code>019f5eaf-ca2f-7340-920b-0f3fee0755ed</code></td><td>產品策略、scaffold、稽核規則引擎</td></tr>
+      <tr><td>13:56</td><td><code>019f5f32-4e3a-71d3-a79a-6ea030c62cd6</code></td><td>掃描器/worker pipeline、API、報告 gating</td></tr>
+      <tr><td>14:40</td><td><code>019f5f5b-72ad-7251-b748-3629aadeb50b</code></td><td>結果設計系統、Docker/Caddy 生產環境、測試</td></tr>
+    </table></div>
+    <p>Session 原始檔位於 <code>~/.codex/sessions/2026/07/14/</code>,如評審需要可提供時間戳紀錄。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">03</span>3 分鐘 Demo 影片腳本(摘要)</h2>
+    <p>完整逐字稿(英文旁白+中文對照)見 <code>hackathon/DEMO_SCRIPT.md</code>。</p>
+    <div class="tablewrap"><table>
+      <tr><th>時間</th><th>畫面</th><th>旁白重點</th></tr>
+      <tr><td>0:00–0:20</td><td>首頁 hero</td><td>Hook:排得上 Google,但 AI 引用得到你嗎?</td></tr>
+      <tr><td>0:20–0:50</td><td>提交網址 → audit 進行中</td><td>持久佇列、Chromium 雙重抓取、確定性證據</td></tr>
+      <tr><td>0:50–1:45</td><td>結果頁動畫</td><td>SEO / AEO / GEO 三維度,每項附證據</td></tr>
+      <tr><td>1:45–2:10</td><td>Email gate → 完整報告</td><td>免費價值 + 名單漏斗商模</td></tr>
+      <tr><td>2:10–2:50</td><td>終端機、docs、README</td><td><strong>⚠️ 必要:Codex(GPT-5.6)三個 session 打造全品,先寫策略再寫程式</strong></td></tr>
+      <tr><td>2:50–3:00</td><td>結果頁收尾</td><td>搜尋分裂成「排序」與「回答」,兩邊都要 ready</td></tr>
+    </table></div>
+    <div class="quote">"GPT-5.6 didn't just autocomplete code — it carried the architecture."</div>
+  </section>
+
+  <section>
+    <h2><span class="no">04</span>Devpost 提交欄位(複製即用)</h2>
+    <p>完整文案見 <code>hackathon/SUBMISSION.md</code>,含 Inspiration / What it does / How we built it / Challenges / Accomplishments / What's next 全部段落。</p>
+    <p><span class="pill">Project name</span>BotScore</p>
+    <p><span class="pill">Tagline</span>Evidence-based SEO / AEO / GEO auditor — find what stops search engines <em>and</em> AI answer engines from citing your site.</p>
+    <p><span class="pill">Built with</span><code>typescript, next.js, react, postgresql, pg-boss, playwright, chromium, docker, caddy, vitest, openai, gpt-5.6, codex, hubspot, listmonk</code></p>
+  </section>
+
+  <section>
+    <h2><span class="no">05</span>剩餘待辦(交作業前)</h2>
+    <ul class="todo">
+      <li class="done">Devpost 報名(帳號 Neteon-Tech,已完成)</li>
+      <li class="done">README 補上 Codex session 證據與評審 quickstart(已完成)</li>
+      <li class="done">Demo 腳本、提交文案、交件包(已完成)</li>
+      <li class="wait"><strong>建立 git repo 並推上 GitHub</strong> — 專案目前不是 git repo,但評審必須有 repo URL(公開,或私有+分享給指定 email)</li>
+      <li class="wait"><strong>錄製 3 分鐘影片</strong>(照腳本)並上傳 YouTube</li>
+      <li class="wait">本機把產品跑起來供錄影:<code>pnpm dev</code> + <code>pnpm worker</code>(需 PostgreSQL)</li>
+      <li class="wait">回 Devpost「Create project」填入 SUBMISSION.md 內容 + 影片連結 + repo URL → 送出</li>
+    </ul>
+    <div class="warn"><strong>截止:2026-07-21 17:00 PT = 台灣 7/22(三)早上 08:00。</strong>建議 7/21 前完成影片,留一天緩衝。</div>
+  </section>
+
+  <footer>BotScore · OpenAI Build Week 2026 · 本文件由交件流程自動產生(hackathon/submission-package.html)</footer>
+</main>
+</body>
+</html>
