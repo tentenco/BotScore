@@ -53,7 +53,7 @@ typescript, next.js, react, postgresql, pg-boss, playwright, chromium, docker, c
 
 ## 其他表單欄位
 
-- **Video demo link**: https://youtu.be/lXHMuYjV_FI
+- **Video demo link**: https://youtu.be/lXHMuYjV_FI (EN) · https://youtu.be/2k-hiPKae10 (中文版)
 - **Public code repo**: https://github.com/tentenco/BotScore
 - **Codex Session IDs**(README 也有):
   - `019f5eaf-ca2f-7340-920b-0f3fee0755ed`
